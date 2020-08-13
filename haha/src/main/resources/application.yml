@@ -1,0 +1,80 @@
+server:
+  port: 8081
+#spring:
+#  profiles:
+#    active: add_request_header_route
+#
+#---
+#spring:
+#  cloud:
+#    gateway:
+#      routes:
+#      - id: add_request_header_route
+#        uri: https://blog.csdn.net
+#        predicates:
+#        - Path=/foo/**
+#        filters:
+#        - RewritePath=/foo/(?<segment>.*), /$\{segment}
+#  profiles: add_request_header_route
+
+
+#
+#spring:
+#  profiles:
+#    active: elapse_route
+#
+#---
+#spring:
+#  cloud:
+#    gateway:
+#      routes:
+#      - id: elapse_route
+#        uri: http://httpbin.org:80/get
+#        filters:
+#        - RequestTime=true
+#        predicates:
+#        - After=2017-01-20T17:42:47.789-07:00[America/Denver]
+#  profiles: elapse_route
+
+
+eureka:
+  client:
+    service-url:
+      #注册服务到eureka上，记住这里要加上eureka-server的用户名和密码
+      defaultZone: http://localhost:8761/eureka
+
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true #表明gateway开启服务注册和发现的功能
+          lowerCaseServiceId: true
+
+      routes:
+      - id: limit_route
+        uri: http://httpbin.org:80/get
+        predicates:
+        - After=2017-01-20T17:42:47.789-07:00[America/Denver]
+        filters:
+      #  - RequestTime=true
+        - name: RequestRateLimiter
+          args:
+            key-resolver: '#{@hostAddrKeyResolver}'
+            redis-rate-limiter.replenishRate: 1 #令牌桶每秒填充平均速率
+            redis-rate-limiter.burstCapacity: 1 #令牌桶总容量
+  application:
+    name: gateway-limiter
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    database: 0
+
+
+
+
+
+
+
+
+

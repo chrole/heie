@@ -1,0 +1,13 @@
+#开启配置服务发现
+spring:
+  cloud:
+    config:
+      discovery:
+        enabled: true
+#配置服务实例名称
+        service-id: conserver
+#配置文件所在分支
+      label: master
+      profile: prod
+#配置服务中心
+      uri: http://localhost:8500/
